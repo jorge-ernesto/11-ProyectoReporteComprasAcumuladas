@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ComprasAcumuladas_Detallada</title>
+</head>
+
+<body>
+
+    <!-- ESTO ES LO QUE VE EL USUARIO -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fomantic-ui/2.9.3/components/icon.min.css" />
+
+    <!-- DataTables -->
+    <!-- https://datatables.net/download/ -->
+    <link
+        href="https://cdn.datatables.net/v/dt/jq-3.7.0/jszip-3.10.1/dt-1.13.6/b-2.4.2/b-colvis-2.4.2/b-html5-2.4.2/b-print-2.4.2/datatables.min.css"
+        rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+    <script
+        src="https://cdn.datatables.net/v/dt/jq-3.7.0/jszip-3.10.1/dt-1.13.6/b-2.4.2/b-colvis-2.4.2/b-html5-2.4.2/b-print-2.4.2/datatables.min.js"></script>
+
+    <div class="bm-viewer" id="myTableContainer" style="display: none;">
+        <div class="bm-viewer-action">
+            <i class="big file green excel icon" onclick="exportToExcel()" style="margin-left: 10px;"></i>
+        </div>
+        <div class="bm-container">
+            <div class="bm-container-body">
+                <table class="bm-report-table" id="myTable">
+                    <thead>
+                        <tr>
+                            <th>
+                                <span>ID INTERNO</span>
+                            </th>
+                            <th>
+                                <span>CUENTA (NUMERO)</span>
+                            </th>
+                            <th>
+                                <span>CUENTA (DESCRIPCION)</span>
+                            </th>
+                            <th>
+                                <span>TIPO</span>
+                            </th>
+                            <th>
+                                <span>FECHA</span>
+                            </th>
+                            <th>
+                                <span>NUMERO DE DOCUMENTO</span>
+                            </th>
+                            <th>
+                                <span>FACTURA DE COMPRA</span>
+                            </th>
+                            <th>
+                                <span>NOMBRE</span>
+                            </th>
+                            <th>
+                                <span>IMPORTE</span>
+                            </th>
+                            <th>
+                                <span>IMPORTE (MONEDA EXTRANJERA)</span>
+                            </th>
+                            <th>
+                                <span>TIPO CAMBIO</span>
+                            </th>
+                            <th>
+                                <span>ARTICULO</span>
+                            </th>
+                            <th>
+                                <span>ARTICULO (NOMBRE PARA MOSTRAR)</span>
+                            </th>
+                            <th>
+                                <span>ARTICULO (NS PE UNIDAD MEDIDA)</span>
+                            </th>
+                            <th>
+                                <span>CANTIDAD</span>
+                            </th>
+                            <th>
+                                <span>NS TIPO OPERACION</span>
+                            </th>
+                            <th>
+                                <span>ORDEN DE COMPRA</span>
+                            </th>
+                            <th>
+                                <span>NOTA</span>
+                            </th>
+                            <th>
+                                <span>BIO_CAM_NRO_DOCUMENTO_DIARIO</span>
+                            </th>
+                            <th>
+                                <span>PERIODO CONTABLE</span>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <#list context.transactions as transaction>
+                            <tr>
+                                <td>${transaction.id_interno}</td>
+                                <td>${transaction.cuenta_numero}</td>
+                                <td>${transaction.cuenta_descripcion}</td>
+                                <td>${transaction.tipo.nombre}</td>
+                                <td>${transaction.fecha}</td>
+                                <td>${transaction.numero_documento}</td>
+                                <td>${transaction.factura_compra.nombre}</td>
+                                <td>${transaction.nombre}</td>
+                                <td>${transaction.importe}</td>
+                                <td>${transaction.importe_me}</td>
+                                <td>${transaction.tipo_cambio}</td>
+                                <td>${transaction.articulo.codigo}</td>
+                                <td>${transaction.articulo_nombre_mostrar}</td>
+                                <td>${transaction.articulo_ns_pe_unidad_medida.nombre}</td>
+                                <td>${transaction.cantidad}</td>
+                                <td>${transaction.ns_tipo_operacion.nombre}</td>
+                                <td>${transaction.creado_desde.nombre}</td>
+                                <td>${transaction.nota}</td>
+                                <td>${transaction.documento_diario}</td>
+                                <td>${transaction.periodo.nombre}</td>
+                            </tr>
+                        </#list>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <!-- CERRAR ESTO ES LO QUE VE EL USUARIO -->
+
+    <script>
+        let table = new DataTable('#myTable', {
+            "processing": true,
+            "serverSide": false,
+            language: {
+                "sProcessing": "Procesando...",
+                "sLengthMenu": "Mostrar _MENU_ registros",
+                "sZeroRecords": "No se encontraron resultados",
+                "sEmptyTable": "Ningún dato disponible en esta tabla",
+                "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                "sInfoEmpty": "Mostrando registros del 0 al 0 de un total de 0 registros",
+                "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
+                "sInfoPostFix": "",
+                "sSearch": "Buscar:",
+                "sUrl": "",
+                "sInfoThousands": ",",
+                "sLoadingRecords": "Cargando...",
+                "oPaginate": {
+                    "sFirst": "Primero",
+                    "sLast": "Último",
+                    "sNext": "Siguiente",
+                    "sPrevious": "Anterior"
+                },
+                "oAria": {
+                    "sSortAscending": ": Activar para ordenar la columna de manera ascendente",
+                    "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                }
+            },
+            "lengthMenu": [[5, 10, 25, 50, 500, 1000, -1], [5, 10, 25, 50, 500, 1000, "All"]],
+            "pageLength": 50,
+            order: [[1, 'asc'], [4, 'asc']],
+            dom: 'Bfrtip', // Blfrtip
+            buttons: [
+                'pageLength', 'excel'
+            ]
+        });
+
+        // Una vez que DataTables esté listo, muestra la tabla
+        if (table) {
+            $('button.buttons-excel').hide(); // Ocultar boton Excel de DataTables
+            $('#myTableContainer').show(); // Muestra la tabla
+
+            function exportToExcel() {
+                $('button.buttons-excel').click();
+            }
+        }
+    </script>
+
+</body>
+
+</html>
